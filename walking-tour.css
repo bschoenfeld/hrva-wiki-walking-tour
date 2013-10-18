@@ -2,10 +2,22 @@ body {
     padding-top: 70px;
 }
 
+#tour-overview {
+    margin-bottom: 10px;
+}
+
 .walking-tour-info {
     display: none;
 }
 
 #map-canvas {
     height: 400px;
+}
+
+.adp > div:not(:nth-child(3)) {
+    display: none;
+}
+
+.adp-placemark {
+    display: none;
 }

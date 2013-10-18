@@ -20,10 +20,18 @@
             </div>
         </nav>
         <div class="container">
-            <h3 id="spot-name"></h3>
-            <div id="spot-content"></div>
-            <div id="directions"></div>
-            <div id="directions-full"></div>
+            <div id="tour-overview">
+                <button id="start-tour" type="button" class="btn btn-success btn-lg btn-block">Start the Tour</button>
+            </div>
+            <div id="tour-spot">
+                <div id="next-button" class="pull-right">
+                    <button type="button" class="btn btn-primary btn-lg">Next</button>
+                </div>
+                <h3 id="spot-name"></h3>
+                <div id="spot-content"></div>
+                <div id="directions"></div>
+                <div id="directions-full"></div>
+            </div>
             <div id="map-canvas"></div>
         </div>
         <script src="./jquery-2.0.3.js"></script>
@@ -35,7 +43,16 @@
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             }
             var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-          
+            var directionsService = new google.maps.DirectionsService();
+            var directionsDisplay = new google.maps.DirectionsRenderer();
+            
+            $("#tour-spot").hide();
+            $("#start-tour").click(function() {
+                $("#tour-overview").hide();
+                $("#tour-spot").show();
+                directionsDisplay.setMap(map);
+            });
+            
             var locateUser = function(onLocated) {
         	    var onSuccess = function(position) {
         	        onLocated(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
@@ -54,6 +71,7 @@
             var loadApp = function(pageData, mapData) {
                 var pages = pageData["objects"];
                 var maps = mapData["objects"];
+                var bounds = new google.maps.LatLngBounds();
                 
                 locateUser(function(userLocation) {
                     var walkingTourSpots = [];
@@ -73,8 +91,18 @@
                             "location": spotLocation,
                             "distanceFromCurrentLocation": distance
                         });
+                        
+                        var marker = new google.maps.Marker({
+            				position: spotLocation,
+            				map: map,
+            				icon: "./yellow-dot.png"
+            			});
+            			bounds.extend(spotLocation);
                     }
                     
+        			map.fitBounds(bounds);
+        			map.setZoom(15);
+        			
                     walkingTourSpots.sort(function(a,b) {
                       if (a.distanceFromCurrentLocation < b.distanceFromCurrentLocation)
                          return -1;
@@ -87,11 +115,8 @@
                     $("#spot-name").html(walkingTourSpots[0]["page"]["name"]);
                     $("#spot-content").html(walkingTourSpots[0]["page"]["content"]);
                     
-                    var directionsDisplay = new google.maps.DirectionsRenderer();
                     directionsDisplay.setPanel($("#directions-full")[0]);
-                    directionsDisplay.setMap(map);
                     
-                    var directionsService = new google.maps.DirectionsService();
                     var request = {
                         origin: userLocation,
                         destination: walkingTourSpots[0]["location"],
