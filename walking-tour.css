@@ -1,0 +1,11 @@
+body {
+    padding-top: 70px;
+}
+
+.walking-tour-info {
+    display: none;
+}
+
+#map-canvas {
+    height: 400px;
+}
