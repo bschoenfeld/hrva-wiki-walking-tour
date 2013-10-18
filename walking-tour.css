@@ -6,6 +6,19 @@ body {
     margin-bottom: 10px;
 }
 
+#tour-spot {
+    display: none;
+}
+
+#tour-end {
+    text-align: center;
+    display: none;
+}
+
+#spot-content img {
+    display: none;
+}
+
 .walking-tour-info {
     display: none;
 }

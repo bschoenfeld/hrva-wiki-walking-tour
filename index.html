@@ -32,6 +32,9 @@
                 <div id="directions"></div>
                 <div id="directions-full"></div>
             </div>
+            <div id="tour-end">
+                <h1>The End!</h1>
+            </div>
             <div id="map-canvas"></div>
         </div>
         <script src="./jquery-2.0.3.js"></script>
@@ -47,24 +50,22 @@
             var directionsDisplay = new google.maps.DirectionsRenderer();
             var userLocation;
             var walkingTourSpots = [];
-            var curTourSpot = 0;
             
-            $("#tour-spot").hide();
             $("#start-tour").click(function() {
                 $("#tour-overview").hide();
                 $("#tour-spot").show();
                 directionsDisplay.setMap(map);
             });
             
-            var setTourStop = function(stopNumber) {
-                $("#spot-name").html(walkingTourSpots[stopNumber]["page"]["name"]);
-                $("#spot-content").html(walkingTourSpots[stopNumber]["page"]["content"]);
+            var setTourStop = function() {
+                $("#spot-name").html(walkingTourSpots[0]["page"]["name"]);
+                $("#spot-content").html(walkingTourSpots[0]["page"]["content"]);
                 
                 directionsDisplay.setPanel($("#directions-full")[0]);
                 
                 var request = {
                     origin: userLocation,
-                    destination: walkingTourSpots[stopNumber]["location"],
+                    destination: walkingTourSpots[0]["location"],
                     travelMode: google.maps.DirectionsTravelMode.WALKING
                 };
                 directionsService.route(request, function(response, status) {
@@ -89,12 +90,35 @@
         			navigator.geolocation.getCurrentPosition(onSuccess, onFail) : onFail();
         	};
         	
-        	$("#next-button button").click(function(){
-                locateUser(function(location) {
-                    userLocation = location;
-                    curTourSpot += 1;
-                    setTourStop(curTourSpot); 
+        	var calculateSpotDistances = function() {
+        	    for(var i=0; i<walkingTourSpots.length; i++) {
+        	        var spotLocation = walkingTourSpots[i]["location"];
+        	        var distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, spotLocation);
+        	        walkingTourSpots[i]["distanceFromCurrentLocation"] = distance;
+    	        }
+    	        
+    	        walkingTourSpots.sort(function(a,b) {
+                    if (a.distanceFromCurrentLocation < b.distanceFromCurrentLocation)
+                        return -1;
+                    if (a.distanceFromCurrentLocation > b.distanceFromCurrentLocation)
+                        return 1;
+                    return 0;
                 });
+        	};
+        	
+        	$("#next-button button").click(function(){
+        	    if(walkingTourSpots.length == 1) {
+        	        $("#tour-spot").hide();
+        	        $("#map-canvas").hide();
+                    $("#tour-end").show();
+        	    } else {
+                    locateUser(function(location) {
+                        userLocation = location;
+                        walkingTourSpots.splice(0,1);
+                        calculateSpotDistances();
+                        setTourStop(); 
+                    });
+                }
             });
     	
             var loadApp = function(pageData, mapData) {
@@ -111,14 +135,13 @@
                         
                         var spotPoint = maps[i]["points"]["coordinates"][0];
                         var spotLocation = new google.maps.LatLng(spotPoint[1], spotPoint[0]);
-                        var distance = google.maps.geometry.spherical.computeDistanceBetween(userLocation, spotLocation);
+                        
                         
                         walkingTourSpots.push({
                             "page": pages[i],
                             "map": maps[i],
                             "id": $(pages[i]["content"]).find(".walking-tour-id").text(),
-                            "location": spotLocation,
-                            "distanceFromCurrentLocation": distance
+                            "location": spotLocation
                         });
                         
                         var marker = new google.maps.Marker({
@@ -131,16 +154,8 @@
                     
         			map.fitBounds(bounds);
         			map.setZoom(15);
-        			
-                    walkingTourSpots.sort(function(a,b) {
-                      if (a.distanceFromCurrentLocation < b.distanceFromCurrentLocation)
-                         return -1;
-                      if (a.distanceFromCurrentLocation > b.distanceFromCurrentLocation)
-                        return 1;
-                      return 0;
-                    });
-                    
-                    setTourStop(0);
+        			calculateSpotDistances();
+                    setTourStop();
                 });
             };
         
