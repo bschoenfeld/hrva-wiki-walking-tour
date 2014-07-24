@@ -122,8 +122,8 @@
             });
     	
             var loadApp = function(pageData, mapData) {
-                var pages = pageData["objects"];
-                var maps = mapData["objects"];
+                var pages = pageData["results"];
+                var maps = mapData["results"];
                 var bounds = new google.maps.LatLngBounds();
                 
                 locateUser(function(location) {
@@ -159,8 +159,8 @@
                 });
             };
         
-            var maps = "https://hrvawiki.org/api/map/?page__page_tags__tags__slug=walkingtour&page__page_tags__tags__slug=portsmouth&limit=100&format=json";
-            var pages = "https://hrvawiki.org/api/page/?page_tags__tags__slug=walkingtour&page_tags__tags__slug=portsmouth&limit=100&format=json";
+            var maps = "http://localwiki.net/api/v4/maps/?region=145&page__tags=portsmouth,walkingtour&limit=100&format=json";
+            var pages = "http://localwiki.net/api/v4/pages/?region=145&tags=portsmouth,walkingtour&limit=100&format=json;
             $.getJSON(pages).done(function(pageData){
                 $.getJSON(maps).done(function(mapData){ 
                     loadApp(pageData, mapData);
