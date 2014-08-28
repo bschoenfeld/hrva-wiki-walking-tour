@@ -1,6 +1,8 @@
 hrva-wiki-walking-tour
 ======================
 
+### [Demo](http://bschoenfeld.github.io/hrva-wiki-walking-tour/)
+
 Web based walking tour app that uses localwiki API for data
 
 1. Create a walking tour of your neighborhood that consists of a number of specific places to visit, or use an existing walking tour like Olde Towne Portsmouth's Path of History (see the example below) or one of [Norfolk's Tours](http://www.visitnorfolktoday.com/things-to-do/tour/self-guided) like the Cannonball Trail.
