@@ -159,8 +159,8 @@
                 });
             };
         
-            var maps = "http://localwiki.net/api/v4/maps/?region=145&page__tags=portsmouth,walkingtour&limit=100&format=json";
-            var pages = "http://localwiki.net/api/v4/pages/?region=145&tags=portsmouth,walkingtour&limit=100&format=json";
+            var maps = "https://localwiki.org/api/v4/maps/?region=145&page__tags=portsmouth,walkingtour&limit=100&format=json";
+            var pages = "https://localwiki.org/api/v4/pages/?region=145&tags=portsmouth,walkingtour&limit=100&format=json";
             $.getJSON(pages).done(function(pageData){
                 $.getJSON(maps).done(function(mapData){ 
                     loadApp(pageData, mapData);
